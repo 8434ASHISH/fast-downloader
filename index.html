@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Fast Downloader - Download YouTube, Instagram, TikTok videos instantly in multiple languages." />
+  <meta name="keywords" content="YouTube downloader, Instagram downloader, TikTok downloader, Fast Downloader, ytdlp" />
+  <meta name="author" content="Fast Downloader Team" />
+  <title>Fast Downloader</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    .platform-icon {
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .glow {
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0073e6, 0 0 20px #0073e6;
+      }
+      to {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0073e6, 0 0 40px #0073e6;
+      }
+    }
+    .feature-card {
+      transition: all 0.3s ease;
+      border-left: 4px solid transparent;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-left: 4px solid #3b82f6;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+    .download-btn {
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+    }
+    .language-selector {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white font-sans min-h-screen">
+  <!-- Floating download icon -->
+  <div class="fixed bottom-6 right-6 bg-blue-500 p-4 rounded-full shadow-lg z-50 animate-bounce hover:bg-blue-600 transition-colors cursor-pointer">
+    <i class="fas fa-download text-white text-2xl"></i>
+  </div>
+
+  <div class="container mx-auto px-4 py-8 flex flex-col items-center">
+    <header class="text-center mb-12 mt-8 w-full">
+      <div class="flex justify-center items-center mb-4">
+        <img src="https://cdn-icons-png.flaticon.com/512/3094/3094833.png" alt="Fast Downloader Logo" class="h-16 w-16 mr-4">
+        <h1 class="text-5xl md:text-6xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500 animate__animated animate__fadeInDown" id="title">Fast Downloader</h1>
+      </div>
+      <p class="text-xl md:text-2xl mt-2 text-gray-300 max-w-3xl mx-auto animate__animated animate__fadeIn animate__delay-1s" id="subtitle">
+        <span class="text-red-500 font-bold"><i class="fab fa-youtube mr-2"></i>YouTube</span>, 
+        <span class="text-pink-400 font-bold"><i class="fab fa-instagram mr-2"></i>Instagram</span>, 
+        <span class="text-green-400 font-bold"><i class="fab fa-tiktok mr-2"></i>TikTok</span> 
+        <span id="download-text">videos in one click</span>
+      </p>
+      <div class="mt-8 animate__animated animate__fadeIn animate__delay-2s">
+        <select id="lang-select" class="language-selector text-white rounded-full px-6 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="en"><i class="fas fa-language mr-2"></i> English</option>
+          <option value="hi"><i class="fas fa-language mr-2"></i> हिन्दी</option>
+          <option value="ar"><i class="fas fa-language mr-2"></i> العربية</option>
+          <option value="bn"><i class="fas fa-language mr-2"></i> বাংলা</option>
+          <option value="es"><i class="fas fa-language mr-2"></i> Español</option>
+          <option value="zh"><i class="fas fa-language mr-2"></i> 中文</option>
+          <option value="fil"><i class="fas fa-language mr-2"></i> Filipino</option>
+          <option value="ru"><i class="fas fa-language mr-2"></i> Русский</option>
+          <option value="ko"><i class="fas fa-language mr-2"></i> 한국어</option>
+          <option value="fr"><i class="fas fa-language mr-2"></i> Français</option>
+          <option value="de"><i class="fas fa-language mr-2"></i> Deutsch</option>
+          <option value="ta"><i class="fas fa-language mr-2"></i> தமிழ்</option>
+          <option value="te"><i class="fas fa-language mr-2"></i> తెలుగు</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="w-full max-w-4xl">
+      <!-- Download Card -->
+      <div class="bg-gray-800/80 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-gray-700 animate__animated animate__fadeInUp animate__delay-2s">
+        <div class="flex items-center mb-6">
+          <i class="fas fa-link text-blue-400 text-2xl mr-3"></i>
+          <label class="text-xl font-semibold" id="link-label">Paste your video link below</label>
+        </div>
+        <div class="relative">
+          <input type="text" id="link-input" class="w-full p-4 rounded-xl text-black shadow-inner focus:outline-none focus:ring-2 focus:ring-blue-500 pr-12" placeholder="https://..." />
+          <i class="fas fa-paste absolute right-4 top-4 text-gray-500 cursor-pointer hover:text-blue-500" onclick="navigator.clipboard.readText().then(text => document.getElementById('link-input').value = text)"></i>
+        </div>
+
+        <div class="flex items-center mt-6 mb-4">
+          <i class="fas fa-tv text-blue-400 text-2xl mr-3"></i>
+          <label class="text-xl font-semibold" id="platform-label">Select platform</label>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="platform-option bg-gray-700/50 hover:bg-gray-700 rounded-xl p-4 cursor-pointer transition-colors border-2 border-gray-700 hover:border-blue-500" data-value="youtube">
+            <div class="flex items-center">
+              <i class="fab fa-youtube text-red-500 text-2xl mr-3"></i>
+              <span class="font-medium">YouTube</span>
+            </div>
+          </div>
+          <div class="platform-option bg-gray-700/50 hover:bg-gray-700 rounded-xl p-4 cursor-pointer transition-colors border-2 border-gray-700 hover:border-pink-500" data-value="instagram">
+            <div class="flex items-center">
+              <i class="fab fa-instagram text-pink-500 text-2xl mr-3"></i>
+              <span class="font-medium">Instagram</span>
+            </div>
+          </div>
+          <div class="platform-option bg-gray-700/50 hover:bg-gray-700 rounded-xl p-4 cursor-pointer transition-colors border-2 border-gray-700 hover:border-green-500" data-value="tiktok">
+            <div class="flex items-center">
+              <i class="fab fa-tiktok text-green-400 text-2xl mr-3"></i>
+              <span class="font-medium">TikTok</span>
+            </div>
+          </div>
+        </div>
+        <input type="hidden" id="platform-select" value="youtube">
+
+        <button id="download-btn" class="download-btn mt-6 w-full p-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold rounded-xl text-lg flex items-center justify-center">
+          <i class="fas fa-download mr-3"></i>
+          <span id="download-btn-text">Download Now</span>
+        </button>
+        <div id="download-status" class="mt-4 text-green-400 font-semibold text-center"></div>
+      </div>
+
+      <!-- Features Section -->
+      <div class="mt-16">
+        <div class="flex items-center mb-8">
+          <i class="fas fa-star text-yellow-400 text-3xl mr-4"></i>
+          <h2 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-500" id="features-title">Key Features</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="feature-card bg-gray-800/80 p-6 rounded-xl hover:shadow-lg">
+            <div class="text-blue-400 text-4xl mb-4"><i class="fas fa-bolt"></i></div>
+            <h3 class="text-xl font-bold mb-2" id="feature-1-title">Lightning Fast</h3>
+            <p class="text-gray-300" id="feature-1-desc">Download videos at maximum speed with our optimized servers</p>
+          </div>
+          <div class="feature-card bg-gray-800/80 p-6 rounded-xl hover:shadow-lg">
+            <div class="text-purple-400 text-4xl mb-4"><i class="fas fa-film"></i></div>
+            <h3 class="text-xl font-bold mb-2" id="feature-2-title">Multiple Formats</h3>
+            <p class="text-gray-300" id="feature-2-desc">MP4, MP3, WEBM and more supported formats</p>
+          </div>
+          <div class="feature-card bg-gray-800/80 p-6 rounded-xl hover:shadow-lg">
+            <div class="text-green-400 text-4xl mb-4"><i class="fas fa-mobile-alt"></i></div>
+            <h3 class="text-xl font-bold mb-2" id="feature-3-title">Mobile Friendly</h3>
+            <p class="text-gray-300" id="feature-3-desc">Works perfectly on all devices and screen sizes</p>
+          </div>
+          <div class="feature-card bg-gray-800/80 p-6 rounded-xl hover:shadow-lg">
+            <div class="text-red-400 text-4xl mb-4"><i class="fas fa-shield-alt"></i></div>
+            <h3 class="text-xl font-bold mb-2" id="feature-4-title">Safe & Secure</h3>
+            <p class="text-gray-300" id="feature-4-desc">No login required, no data collection</p>
+          </div>
+          <div class="feature-card bg-gray-800/80 p-6 rounded-xl hover:shadow-lg">
+            <div class="text-yellow-400 text-4xl mb-4"><i class="fas fa-globe"></i></div>
+            <h3 class="text-xl font-bold mb-2" id="feature-5-title">Multi-Language</h3>
+            <p class="text-gray-300" id="feature-5-desc">Supports 12+ languages for global users</p>
+          </div>
+          <div class="feature-card bg-gray-800/80 p-6 rounded-xl hover:shadow-lg">
+            <div class="text-pink-400 text-4xl mb-4"><i class="fas fa-infinity"></i></div>
+            <h3 class="text-xl font-bold mb-2" id="feature-6-title">Unlimited Downloads</h3>
+            <p class="text-gray-300" id="feature-6-desc">No restrictions on number of downloads</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- How To Use Section -->
+      <div class="mt-16 bg-gray-800/50 p-8 rounded-2xl border border-gray-700">
+        <div class="flex items-center mb-8">
+          <i class="fas fa-question-circle text-blue-400 text-3xl mr-4"></i>
+          <h2 class="text-3xl font-bold" id="how-to-use-title">How To Use</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="flex items-start">
+            <div class="bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">1</div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2" id="step-1-title">Paste the URL</h3>
+              <p class="text-gray-300" id="step-1-desc">Copy and paste the video link from YouTube, Instagram or TikTok</p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">2</div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2" id="step-2-title">Select Platform</h3>
+              <p class="text-gray-300" id="step-2-desc">Choose the correct platform where the video is from</p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">3</div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2" id="step-3-title">Choose Format</h3>
+              <p class="text-gray-300" id="step-3-desc">Select video quality or audio format (MP3)</p>
+            </div>
+          </div>
+          <div class="flex items-start">
+            <div class="bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold mr-4 flex-shrink-0">4</div>
+            <div>
+              <h3 class="text-xl font-semibold mb-2" id="step-4-title">Download</h3>
+              <p class="text-gray-300" id="step-4-desc">Click download and save your file in seconds</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="mt-16">
+        <div class="flex items-center mb-8">
+          <i class="fas fa-comments text-blue-400 text-3xl mr-4"></i>
+          <h2 class="text-3xl font-bold" id="faq-title">Frequently Asked Questions</h2>
+        </div>
+        <div class="space-y-4" id="faq-list">
+          <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition-colors">
+            <div class="flex items-start">
+              <i class="fas fa-question-circle text-blue-400 text-xl mr-4 mt-1 flex-shrink-0"></i>
+              <div>
+                <h3 class="text-xl font-semibold" id="faq-1-q">Is this service free to use?</h3>
+                <p class="mt-2 text-gray-300" id="faq-1-a"><i class="fas fa-check-circle text-green-400 mr-2"></i> Yes, our service is completely free with no hidden charges.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition-colors">
+            <div class="flex items-start">
+              <i class="fas fa-question-circle text-blue-400 text-xl mr-4 mt-1 flex-shrink-0"></i>
+              <div>
+                <h3 class="text-xl font-semibold" id="faq-2-q">What video quality is available?</h3>
+                <p class="mt-2 text-gray-300" id="faq-2-a"><i class="fas fa-check-circle text-green-400 mr-2"></i> We support up to 4K resolution for YouTube and highest available quality for other platforms.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition-colors">
+            <div class="flex items-start">
+              <i class="fas fa-question-circle text-blue-400 text-xl mr-4 mt-1 flex-shrink-0"></i>
+              <div>
+                <h3 class="text-xl font-semibold" id="faq-3-q">Can I download private videos?</h3>
+                <p class="mt-2 text-gray-300" id="faq-3-a"><i class="fas fa-times-circle text-red-400 mr-2"></i> No, our service only works with publicly available videos.</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-800/50 p-6 rounded-xl border border-gray-700 hover:border-blue-500 transition-colors">
+            <div class="flex items-start">
+              <i class="fas fa-question-circle text-blue-400 text-xl mr-4 mt-1 flex-shrink-0"></i>
+              <div>
+                <h3 class="text-xl font-semibold" id="faq-4-q">Is there a download limit?</h3>
+                <p class="mt-2 text-gray-300" id="faq-4-a"><i class="fas fa-infinity text-blue-400 mr-2"></i> No, you can download as many videos as you want without any restrictions.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Section -->
+      <div class="mt-16 bg-gradient-to-r from-blue-600 to-purple-600 p-8 rounded-2xl text-center">
+        <h2 class="text-3xl font-bold mb-8" id="stats-title">Our Happy Users</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div>
+            <div class="text-4xl font-bold mb-2 glow">10M+</div>
+            <p class="text-gray-200" id="stat-1">Downloads</p>
+          </div>
+          <div>
+            <div class="text-4xl font-bold mb-2 glow">150+</div>
+            <p class="text-gray-200" id="stat-2">Countries</p>
+          </div>
+          <div>
+            <div class="text-4xl font-bold mb-2 glow">99.9%</div>
+            <p class="text-gray-200" id="stat-3">Uptime</p>
+          </div>
+          <div>
+            <div class="text-4xl font-bold mb-2 glow">12+</div>
+            <p class="text-gray-200" id="stat-4">Languages</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="mt-20 text-gray-400 text-center w-full border-t border-gray-700 pt-8 pb-12" id="footer">
+      <div class="flex justify-center space-x-6 mb-6">
+        <a href="#" class="hover:text-white transition-colors"><i class="fab fa-twitter text-2xl"></i></a>
+        <a href="#" class="hover:text-white transition-colors"><i class="fab fa-facebook text-2xl"></i></a>
+        <a href="#" class="hover:text-white transition-colors"><i class="fab fa-instagram text-2xl"></i></a>
+        <a href="#" class="hover:text-white transition-colors"><i class="fab fa-github text-2xl"></i></a>
+      </div>
+      <div class="flex justify-center flex-wrap gap-4 mb-6">
+        <a href="#" class="hover:underline hover:text-white transition-colors" id="footer-privacy">Privacy Policy</a>
+        <a href="#" class="hover:underline hover:text-white transition-colors" id="footer-terms">Terms of Service</a>
+        <a href="#" class="hover:underline hover:text-white transition-colors" id="footer-contact">Contact Us</a>
+        <a href="#" class="hover:underline hover:text-white transition-colors" id="footer-about">About</a>
+        <a href="#" class="hover:underline hover:text-white transition-colors" id="footer-dmca">DMCA</a>
+      </div>
+      <p class="mb-2 text-sm" id="footer-affiliate">
+        <i class="fas fa-info-circle mr-2"></i> We are not affiliated with YouTube, Instagram, TikTok or their parent companies.
+      </p>
+      <p class="text-xs" id="footer-note">
+        <i class="fas fa-exclamation-triangle mr-2"></i> For personal use only. Downloading copyrighted material may violate terms of service.
+      </p>
+      <p class="mt-6 text-gray-500 text-sm">© 2023 Fast Downloader. <span id="footer-rights">All rights reserved</span>.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Complete translations for all languages
+    const translations = {
+      en: {
+        title: "Fast Downloader",
+        subtitle: "Download from",
+        downloadText: "videos in one click",
+        linkLabel: "Paste your video link below",
+        platformLabel: "Select platform",
+        downloadBtnText: "Download Now",
+        featuresTitle: "Key Features",
+        feature1Title: "Lightning Fast",
+        feature1Desc: "Download videos at maximum speed with our optimized servers",
+        feature2Title: "Multiple Formats",
+        feature2Desc: "MP4, MP3, WEBM and more supported formats",
+        feature3Title: "Mobile Friendly",
+        feature3Desc: "Works perfectly on all devices and screen sizes",
+        feature4Title: "Safe & Secure",
+        feature4Desc: "No login required, no data collection",
+        feature5Title: "Multi-Language",
+        feature5Desc: "Supports 12+ languages for global users",
+        feature6Title: "Unlimited Downloads",
+        feature6Desc: "No restrictions on number of downloads",
+        howToUseTitle: "How To Use",
+        step1Title: "Paste the URL",
+        step1Desc: "Copy and paste the video link from YouTube, Instagram or TikTok",
+        step2Title: "Select Platform",
+        step2Desc: "Choose the correct platform where the video is from",
+        step3Title: "Choose Format",
+        step3Desc: "Select video quality or audio format (MP3)",
+        step4Title: "Download",
+        step4Desc: "Click download and save your file in seconds",
+        faqTitle: "Frequently Asked Questions",
+        faq1Q: "Is this service free to use?",
+        faq1A: "Yes, our service is completely free with no hidden charges.",
+        faq2Q: "What video quality is available?",
+        faq2A: "We support up to 4K resolution for YouTube and highest available quality for other platforms.",
+        faq3Q: "Can I download private videos?",
+        faq3A: "No, our service only works with publicly available videos.",
+        faq4Q: "Is there a download limit?",
+        faq4A: "No, you can download as many videos as you want without any restrictions.",
+        statsTitle: "Our Happy Users",
+        stat1: "Downloads",
+        stat2: "Countries",
+        stat3: "Uptime",
+        stat4: "Languages",
+        footerPrivacy: "Privacy Policy",
+        footerTerms: "Terms of Service",
+        footerContact: "Contact Us",
+        footerAbout: "About",
+        footerDmca: "DMCA",
+        footerAffiliate: "We are not affiliated with YouTube, Instagram, TikTok or their parent companies.",
+        footerNote: "For personal use only. Downloading copyrighted material may violate terms of service.",
+        footerRights: "All rights reserved"
+      },
+      hi: {
+        title: "फास्ट डाउनलोडर",
+        subtitle: "से डाउनलोड करें",
+        downloadText: "वीडियो सिर्फ एक क्लिक में",
+        linkLabel: "नीचे अपना वीडियो लिंक पेस्ट करें",
+        platformLabel: "प्लेटफॉर्म चुनें",
+        downloadBtnText: "अभी डाउनलोड करें",
+        featuresTitle: "मुख्य विशेषताएं",
+        feature1Title: "बिजली की तेज गति",
+        feature1Desc: "हमारे अनुकूलित सर्वर के साथ अधिकतम गति से वीडियो डाउनलोड करें",
+        feature2Title: "कई फॉर्मेट",
+        feature2Desc: "MP4, MP3, WEBM और अन्य समर्थित प्रारूप",
+        feature3Title: "मोबाइल अनुकूल",
+        feature3Desc: "सभी डिवाइस और स्क्रीन आकार पर पूरी तरह काम करता है",
+        feature4Title: "सुरक्षित और सुरक्षित",
+        feature4Desc: "लॉगिन की आवश्यकता नहीं, कोई डेटा संग्रह नहीं",
+        feature5Title: "बहुभाषी",
+        feature5Desc: "वैश्विक उपयोगकर्ताओं के लिए 12+ भाषाओं का समर्थन",
+        feature6Title: "असीमित डाउनलोड",
+        feature6Desc: "डाउनलोड की संख्या पर कोई प्रतिबंध नहीं",
+        howToUseTitle: "उपयोग कैसे करें",
+        step1Title: "URL पेस्ट करें",
+        step1Desc: "YouTube, Instagram या TikTok से वीडियो लिंक कॉपी और पेस्ट करें",
+        step2Title: "प्लेटफॉर्म चुनें",
+        step2Desc: "सही प्लेटफॉर्म चुनें जहां से वीडियो है",
+        step3Title: "फॉर्मेट चुनें",
+        step3Desc: "वीडियो क्वालिटी या ऑडियो फॉर्मेट (MP3) चुनें",
+        step4Title: "डाउनलोड",
+        step4Desc: "डाउनलोड पर क्लिक करें और सेकंड में अपनी फाइल सेव करें",
+        faqTitle: "अक्सर पूछे जाने वाले प्रश्न",
+        faq1Q: "क्या यह सेवा मुफ्त है?",
+        faq1A: "हां, हमारी सेवा पूरी तरह मुफ्त है बिना किसी छिपे शुल्क के।",
+        faq2Q: "कौन सी वीडियो क्वालिटी उपलब्ध है?",
+        faq2A: "हम YouTube के लिए 4K रिज़ॉल्यूशन और अन्य प्लेटफॉर्म के लिए उच्चतम उपलब्ध क्वालिटी सपोर्ट करते हैं।",
+        faq3Q: "क्या मैं प्राइवेट वीडियो डाउनलोड कर सकता हूँ?",
+        faq3A: "नहीं, हमारी सेवा केवल सार्वजनिक रूप से उपलब्ध वीडियो के साथ काम करती है।",
+        faq4Q: "क्या कोई डाउनलोड सीमा है?",
+        faq4A: "नहीं, आप बिना किसी प्रतिबंध के जितने चाहें उतने वीडियो डाउनलोड कर सकते हैं।",
+        statsTitle: "हमारे खुश उपयोगकर्ता",
+        stat1: "डाउनलोड",
+        stat2: "देश",
+        stat3: "अपटाइम",
+        stat4: "भाषाएँ",
+        footerPrivacy: "गोपनीयता नीति",
+        footerTerms: "सेवा की शर्तें",
+        footerContact: "संपर्क करें",
+        footerAbout: "हमारे बारे में",
+        footerDmca: "DMCA",
+        footerAffiliate: "हम YouTube, Instagram, TikTok या उनकी मूल कंपनियों से संबद्ध नहीं हैं।",
+        footerNote: "केवल व्यक्तिगत उपयोग के लिए। कॉपीराइट सामग्री डाउनलोड करना सेवा की शर्तों का उल्लंघन हो सकता है।",
+        footerRights: "सर्वाधिकार सुरक्षित"
+      },
+      ar: {
+        title: "تحميل سريع",
+        subtitle: "قم بالتحميل من",
+        downloadText: "مقاطع الفيديو بنقرة واحدة",
+        linkLabel: "الصق رابط الفيديو الخاص بك أدناه",
+        platformLabel: "اختر المنصة",
+        downloadBtnText: "تحميل الآن",
+        featuresTitle: "الميزات الرئيسية",
+        feature1Title: "سريع مثل البرق",
+        feature1Desc: "قم بتحميل الفيديوهات بأقصى سرعة مع خوادمنا المخصصة",
+        feature2Title: "تنسيقات متعددة",
+        feature2Desc: "يدعم MP4، MP3، WEBM والمزيد",
+        feature3Title: "متوافق مع الجوال",
+        feature3Desc: "يعمل بشكل مثالي على جميع الأجهزة وأحجام الشاشات",
+        feature4Title: "آمن ومضمون",
+        feature4Desc: "لا حاجة لتسجيل الدخول، لا جمع للبيانات",
+        feature5Title: "متعدد اللغات",
+        feature5Desc: "يدعم 12+ لغة للمستخدمين حول العالم",
+        feature6Title: "تحميل غير محدود",
+        feature6Desc: "لا توجد قيود على عدد التحميلات",
+        howToUseTitle: "كيفية الاستخدام",
+        step1Title: "الصق الرابط",
+        step1Desc: "انسخ والصق رابط الفيديو من YouTube أو Instagram أو TikTok",
+        step2Title: "اختر المنصة",
+        step2Desc: "اختر المنصة الصحيحة التي يأتي منها الفيديو",
+        step3Title: "اختر التنسيق",
+        step3Desc: "حدد جودة الفيديو أو تنسيق الصوت (MP3)",
+        step4Title: "تحميل",
+        step4Desc: "انقر فوق تحميل واحفظ ملفك في ثوانٍ",
+        faqTitle: "أسئلة مكررة",
+        faq1Q: "هل هذه الخدمة مجانية؟",
+        faq1A: "نعم، خدمتنا مجانية تمامًا بدون أي رسوم خفية.",
+        faq2Q: "ما هي جودة الفيديو المتاحة؟",
+        faq2A: "نحن ندعم دقة تصل إلى 4K لـ YouTube وأعلى جودة متاحة للأنظمة الأساسية الأخرى.",
+        faq3Q: "هل يمكنني تنزيل مقاطع الفيديو الخاصة؟",
+        faq3A: "لا، تعمل خدمتنا فقط مع مقاطع الفيديو المتاحة للجمهور.",
+        faq4Q: "هل هناك حد للتحميل؟",
+        faq4A: "لا، يمكنك تنزيل عدد الفيديوهات التي تريدها دون أي قيود.",
+        statsTitle: "مستخدمينا السعداء",
+        stat1: "التحميلات",
+        stat2: "الدول",
+        stat3: "وقت التشغيل",
+        stat4: "اللغات",
+        footerPrivacy: "سياسة الخصوصية",
+        footerTerms: "شروط الخدمة",
+        footerContact: "اتصل بنا",
+        footerAbout: "معلومات عنا",
+        footerDmca: "DMCA",
+        footerAffiliate: "نحن لسنا تابعين لـ YouTube أو Instagram أو TikTok أو الشركات الأم.",
+        footerNote: "للاستخدام الشخصي فقط. قد ينتهك تنزيل المواد المحمية بحقوق الطبع والنشر شروط الخدمة.",
+        footerRights: "جميع الحقوق محفوظة"
+      },
+      bn: {
+        title: "ফাস্ট ডাউনলোডার",
+        subtitle: "থেকে ডাউনলোড করুন",
+        downloadText: "এক ক্লিকে ভিডিও",
+        linkLabel: "নীচে আপনার ভিডিও লিঙ্ক পেস্ট করুন",
+        platformLabel: "প্ল্যাটফর্ম নির্বাচন করুন",
+        downloadBtnText: "এখনই ডাউনলোড করুন",
+        featuresTitle: "প্রধান বৈশিষ্ট্য",
+        feature1Title: "বাজের মতো দ্রুত",
+        feature1Desc: "আমাদের অপ্টিমাইজড সার্ভার দিয়ে সর্বোচ্চ গতিতে ভিডিও ডাউনলোড করুন",
+        feature2Title: "একাধিক ফরম্যাট",
+        feature2Desc: "MP4, MP3, WEBM এবং অন্যান্য সমর্থিত ফরম্যাট",
+        feature3Title: "মোবাইল বান্ধব",
+        feature3Desc: "সকল ডিভাইস এবং স্ক্রিন সাইজে নিখুঁতভাবে কাজ করে",
+        feature4Title: "নিরাপদ ও সুরক্ষিত",
+        feature4Desc: "লগইনের প্রয়োজন নেই, কোন ডেটা সংগ্রহ নেই",
+        feature5Title: "বহুভাষিক",
+        feature5Desc: "বিশ্বব্যাপী ব্যবহারকারীদের জন্য ১২+ ভাষা সমর্থিত",
+        feature6Title: "সীমাহীন ডাউনলোড",
+        feature6Desc: "ডাউনলোড সংখ্যার উপর কোন সীমাবদ্ধতা নেই",
+        howToUseTitle: "ব্যবহার বিধি",
+        step1Title: "লিঙ্ক পেস্ট করুন",
+        step1Desc: "YouTube, Instagram বা TikTok থেকে ভিডিও লিঙ্ক কপি ও পেস্ট করুন",
+        step2Title: "প্ল্যাটফর্ম নির্বাচন করুন",
+        step2Desc: "সঠিক প্ল্যাটফর্ম নির্বাচন করুন যেখান থেকে ভিডিওটি এসেছে",
+        step3Title: "ফরম্যাট নির্বাচন করুন",
+        step3Desc: "ভিডিও কোয়ালিটি বা অডিও ফরম্যাট (MP3) নির্বাচন করুন",
+        step4Title: "ডাউনলোড করুন",
+        step4Desc: "ডাউনলোড ক্লিক করুন এবং সেকেন্ডের মধ্যে আপনার ফাইল সেভ করুন",
+        faqTitle: "সচরাচর জিজ্ঞাস্য",
+        faq1Q: "এই সেবা কি বিনামূল্যে?",
+        faq1A: "হ্যাঁ, আমাদের সেবা সম্পূর্ণ বিনামূল্যে কোন গোপন ফি ছাড়াই।",
+        faq2Q: "কোন ভিডিও কোয়ালিটি পাওয়া যায়?",
+        faq2A: "আমরা YouTube-এর জন্য 4K রেজোলিউশন এবং অন্যান্য প্ল্যাটফর্মের জন্য সর্বোচ্চ কোয়ালিটি সাপোর্ট করি।",
+        faq3Q: "আমি কি প্রাইভেট ভিডিও ডাউনলোড করতে পারি?",
+        faq3A: "না, আমাদের সেবা শুধুমাত্র পাবলিক ভিডিওর জন্য কাজ করে।",
+        faq4Q: "ডাউনলোডের কোন সীমা আছে কি?",
+        faq4A: "না, আপনি যত খুশি তত ভিডিও ডাউনলোড করতে পারেন কোন সীমাবদ্ধতা ছাড়াই।",
+        statsTitle: "আমাদের খুশি ব্যবহারকারী",
+        stat1: "ডাউনলোড",
+        stat2: "দেশ",
+        stat3: "আপটাইম",
+        stat4: "ভাষা",
+        footerPrivacy: "গোপনীয়তা নীতি",
+        footerTerms: "সেবা শর্তাবলী",
+        footerContact: "যোগাযোগ করুন",
+        footerAbout: "আমাদের সম্পর্কে",
+        footerDmca: "DMCA",
+        footerAffiliate: "আমরা YouTube, Instagram, TikTok বা তাদের মূল কোম্পানির সাথে সংশ্লিষ্ট নই।",
+        footerNote: "ব্যক্তিগত ব্যবহারের জন্য মাত্র। কপিরাইট উপাদান ডাউনলোড করা পরিষেবার শর্তাবলী লঙ্ঘন করতে পারে।",
+        footerRights: "সমস্ত অধিকার সংরক্ষিত"
+      },
+      es: {
+        title: "Descargador Rápido",
+        subtitle: "Descarga desde",
+        downloadText: "videos con un solo clic",
+        linkLabel: "Pega tu enlace de video abajo",
+        platformLabel: "Selecciona plataforma",
+        downloadBtnText: "Descargar Ahora",
+        featuresTitle: "Características Principales",
+        feature1Title: "Rápido como el rayo",
+        feature1Desc: "Descarga videos a máxima velocidad con nuestros servidores optimizados",
+        feature2Title: "Múltiples formatos",
+        feature2Desc: "MP4, MP3, WEBM y más formatos soportados",
+        feature3Title: "Compatible con móviles",
+        feature3Desc: "Funciona perfectamente en todos los dispositivos y tamaños de pantalla",
+        feature4Title: "Seguro y protegido",
+        feature4Desc: "No requiere inicio de sesión, no recolectamos datos",
+        feature5Title: "Multilingüe",
+        feature5Desc: "Soporta 12+ idiomas para usuarios globales",
+        feature6Title: "Descargas ilimitadas",
+        feature6Desc: "Sin restricciones en el número de descargas",
+        howToUseTitle: "Cómo Usar",
+        step1Title: "Pega la URL",
+        step1Desc: "Copia y pega el enlace del video de YouTube, Instagram o TikTok",
+        step2Title: "Selecciona plataforma",
+        step2Desc: "Elige la plataforma correcta de donde proviene el video",
+        step3Title: "Elige formato",
+        step3Desc: "Selecciona calidad de video o formato de audio (MP3)",
+        step4Title: "Descargar",
+        step4Desc: "Haz clic en descargar y guarda tu archivo en segundos",
+        faqTitle: "Preguntas Frecuentes",
+        faq1Q: "¿Este servicio es gratuito?",
+        faq1A: "Sí, nuestro servicio es completamente gratis sin cargos ocultos.",
+        faq2Q: "¿Qué calidad de video está disponible?",
+        faq2A: "Soportamos hasta resolución 4K para YouTube y la mayor calidad disponible para otras plataformas.",
+        faq3Q: "¿Puedo descargar videos privados?",
+        faq3A: "No, nuestro servicio solo funciona con videos disponibles públicamente.",
+        faq4Q: "¿Hay límite de descargas?",
+        faq4A: "No, puedes descargar tantos videos como quieras sin restricciones.",
+        statsTitle: "Nuestros Usuarios Felices",
+        stat1: "Descargas",
+        stat2: "Países",
+        stat3: "Tiempo activo",
+        stat4: "Idiomas",
+        footerPrivacy: "Política de Privacidad",
+        footerTerms: "Términos de Servicio",
+        footerContact: "Contáctenos",
+        footerAbout: "Acerca de",
+        footerDmca: "DMCA",
+        footerAffiliate: "No estamos afiliados con YouTube, Instagram, TikTok o sus empresas matrices.",
+        footerNote: "Solo para uso personal. Descargar material con derechos de autor puede violar los términos de servicio.",
+        footerRights: "Todos los derechos reservados"
+      },
+      zh: {
+        title: "快速下载器",
+        subtitle: "从以下平台下载",
+        downloadText: "一键获取视频",
+        linkLabel: "在下方粘贴您的视频链接",
+        platformLabel: "选择平台",
+        downloadBtnText: "立即下载",
+        featuresTitle: "主要特点",
+        feature1Title: "闪电般快速",
+        feature1Desc: "使用我们的优化服务器以最快速度下载视频",
+        feature2Title: "多种格式",
+        feature2Desc: "支持MP4、MP3、WEBM等多种格式",
+        feature3Title: "移动友好",
+        feature3Desc: "在所有设备和屏幕尺寸上完美运行",
+        feature4Title: "安全可靠",
+        feature4Desc: "无需登录，不收集数据",
+        feature5Title: "多语言",
+        feature5Desc: "支持12+种语言，面向全球用户",
+        feature6Title: "无限下载",
+        feature6Desc: "下载数量无限制",
+        howToUseTitle: "使用指南",
+        step1Title: "粘贴链接",
+        step1Desc: "复制并粘贴来自YouTube、Instagram或TikTok的视频链接",
+        step2Title: "选择平台",
+        step2Desc: "选择视频来源的正确平台",
+        step3Title: "选择格式",
+        step3Desc: "选择视频质量或音频格式(MP3)",
+        step4Title: "下载",
+        step4Desc: "点击下载，几秒钟内即可保存文件",
+        faqTitle: "常见问题",
+        faq1Q: "这项服务是免费的吗？",
+        faq1A: "是的，我们的服务完全免费，没有任何隐藏费用。",
+        faq2Q: "有哪些视频质量可选？",
+        faq2A: "我们支持YouTube的4K分辨率和其他平台的最高可用质量。",
+        faq3Q: "可以下载私人视频吗？",
+        faq3A: "不可以，我们的服务仅适用于公开视频。",
+        faq4Q: "有下载限制吗？",
+        faq4A: "没有，您可以无限制地下载任意数量的视频。",
+        statsTitle: "我们的满意用户",
+        stat1: "下载次数",
+        stat2: "国家",
+        stat3: "正常运行时间",
+        stat4: "语言",
+        footerPrivacy: "隐私政策",
+        footerTerms: "服务条款",
+        footerContact: "联系我们",
+        footerAbout: "关于我们",
+        footerDmca: "DMCA",
+        footerAffiliate: "我们与YouTube、Instagram、TikTok或其母公司没有关联。",
+        footerNote: "仅供个人使用。下载受版权保护的材料可能违反服务条款。",
+        footerRights: "版权所有"
+      },
+      fil: {
+        title: "Mabilis na Downloader",
+        subtitle: "Mag-download mula sa",
+        downloadText: "mga video sa isang click lamang",
+        linkLabel: "I-paste ang iyong video link sa ibaba",
+        platformLabel: "Piliin ang platform",
+        downloadBtnText: "I-download Ngayon",
+        featuresTitle: "Pangunahing Mga Tampok",
+        feature1Title: "Mabilis na Parang Kidlat",
+        feature1Desc: "Mag-download ng mga video sa pinakamataas na bilis gamit ang aming optimized servers",
+        feature2Title: "Maraming Format",
+        feature2Desc: "MP4, MP3, WEBM at iba pang sinusuportahang format",
+        feature3Title: "Mobile Friendly",
+        feature3Desc: "Gumagana nang perpekto sa lahat ng device at screen size",
+        feature4Title: "Ligtas at Secure",
+        feature4Desc: "Hindi kailangan ng login, walang data collection",
+        feature5Title: "Maraming Wika",
+        feature5Desc: "Sinusuportahan ang 12+ wika para sa global users",
+        feature6Title: "Walang Limitasyong Download",
+        feature6Desc: "Walang restrictions sa bilang ng downloads",
+        howToUseTitle: "Paano Gamitin",
+        step1Title: "I-paste ang URL",
+        step1Desc: "Kopyahin at i-paste ang video link mula sa YouTube, Instagram o TikTok",
+        step2Title: "Piliin ang Platform",
+        step2Desc: "Piliin ang tamang platform kung saan nagmula ang video",
+        step3Title: "Piliin ang Format",
+        step3Desc: "Piliin ang video quality o audio format (MP3)",
+        step4Title: "I-download",
+        step4Desc: "I-click ang download at i-save ang iyong file sa ilang segundo",
+        faqTitle: "Mga Madalas Itanong",
+        faq1Q: "Libre ba ang serbisyong ito?",
+        faq1A: "Oo, ang aming serbisyo ay ganap na libre nang walang hidden charges.",
+        faq2Q: "Anong video quality ang available?",
+        faq2A: "Sinusuportahan namin ang hanggang 4K resolution para sa YouTube at pinakamataas na available quality para sa ibang platform.",
+        faq3Q: "Maaari ba akong mag-download ng private videos?",
+        faq3A: "Hindi, ang aming serbisyo ay gumagana lamang sa publicly available videos.",
+        faq4Q: "May download limit ba?",
+        faq4A: "Wala, maaari kang mag-download ng kahit ilang videos na gusto mo nang walang restrictions.",
+        statsTitle: "Ang Aming Masasayang Users",
+        stat1: "Downloads",
+        stat2: "Mga Bansa",
+        stat3: "Uptime",
+        stat4: "Mga Wika",
+        footerPrivacy: "Patakaran sa Privacy",
+        footerTerms: "Mga Tuntunin ng Serbisyo",
+        footerContact: "Makipag-ugnayan sa Amin",
+        footerAbout: "Tungkol sa Amin",
+        footerDmca: "DMCA",
+        footerAffiliate: "Hindi kami kaugnay ng YouTube, Instagram, TikTok o kanilang parent companies.",
+        footerNote: "Para sa personal na paggamit lamang. Ang pag-download ng copyrighted material ay maaaring lumabag sa mga tuntunin ng serbisyo.",
+        footerRights: "Lahat ng Karapatan ay Nakalaan"
+      },
+      ru: {
+        title: "Быстрый Загрузчик",
+        subtitle: "Скачивайте с",
+        downloadText: "видео в один клик",
+        linkLabel: "Вставьте ссылку на видео ниже",
+        platformLabel: "Выберите платформу",
+        downloadBtnText: "Скачать Сейчас",
+        featuresTitle: "Основные Возможности",
+        feature1Title: "Молниеносная скорость",
+        feature1Desc: "Скачивайте видео на максимальной скорости с нашими оптимизированными серверами",
+        feature2Title: "Множество форматов",
+        feature2Desc: "MP4, MP3, WEBM и другие поддерживаемые форматы",
+        feature3Title: "Для мобильных",
+        feature3Desc: "Идеально работает на всех устройствах и размерах экрана",
+        feature4Title: "Безопасно и надежно",
+        feature4Desc: "Не требует входа, не собирает данные",
+        feature5Title: "Многоязычный",
+        feature5Desc: "Поддержка 12+ языков для пользователей по всему миру",
+        feature6Title: "Безлимитные загрузки",
+        feature6Desc: "Нет ограничений на количество загрузок",
+        howToUseTitle: "Как Использовать",
+        step1Title: "Вставьте ссылку",
+        step1Desc: "Скопируйте и вставьте ссылку на видео с YouTube, Instagram или TikTok",
+        step2Title: "Выберите платформу",
+        step2Desc: "Выберите правильную платформу, с которой видео",
+        step3Title: "Выберите формат",
+        step3Desc: "Выберите качество видео или аудиоформат (MP3)",
+        step4Title: "Скачать",
+        step4Desc: "Нажмите скачать и сохраните файл за секунды",
+        faqTitle: "Частые Вопросы",
+        faq1Q: "Этот сервис бесплатный?",
+        faq1A: "Да, наш сервис полностью бесплатный без скрытых платежей.",
+        faq2Q: "Какое качество видео доступно?",
+        faq2A: "Мы поддерживаем до 4K разрешения для YouTube и максимальное доступное качество для других платформ.",
+        faq3Q: "Можно ли скачивать приватные видео?",
+        faq3A: "Нет, наш сервис работает только с публично доступными видео.",
+        faq4Q: "Есть ли ограничение на скачивание?",
+        faq4A: "Нет, вы можете скачивать столько видео, сколько хотите без ограничений.",
+        statsTitle: "Наши Довольные Пользователи",
+        stat1: "Загрузки",
+        stat2: "Страны",
+        stat3: "Аптайм",
+        stat4: "Языки",
+        footerPrivacy: "Политика Конфиденциальности",
+        footerTerms: "Условия Использования",
+        footerContact: "Связаться с Нами",
+        footerAbout: "О Нас",
+        footerDmca: "DMCA",
+        footerAffiliate: "Мы не связаны с YouTube, Instagram, TikTok или их материнскими компаниями.",
+        footerNote: "Только для личного использования. Скачивание защищенного авторским правом контента может нарушать условия обслуживания.",
+        footerRights: "Все Права Защищены"
+      },
+      ko: {
+        title: "빠른 다운로더",
+        subtitle: "다음에서 다운로드",
+        downloadText: "한 번의 클릭으로 동영상",
+        linkLabel: "아래에 동영상 링크를 붙여넣기",
+        platformLabel: "플랫폼 선택",
+        downloadBtnText: "지금 다운로드",
+        featuresTitle: "주요 기능",
+        feature1Title: "번개 같은 속도",
+        feature1Desc: "최적화된 서버로 최고 속도로 동영상 다운로드",
+        feature2Title: "다양한 형식",
+        feature2Desc: "MP4, MP3, WEBM 및 기타 지원 형식",
+        feature3Title: "모바일 친화적",
+        feature3Desc: "모든 기기와 화면 크기에 완벽하게 작동",
+        feature4Title: "안전하고 보안",
+        feature4Desc: "로그인 불필요, 데이터 수집 없음",
+        feature5Title: "다국어 지원",
+        feature5Desc: "전 세계 사용자를 위한 12개 이상의 언어 지원",
+        feature6Title: "무제한 다운로드",
+        feature6Desc: "다운로드 횟수 제한 없음",
+        howToUseTitle: "사용 방법",
+        step1Title: "URL 붙여넣기",
+        step1Desc: "YouTube, Instagram 또는 TikTok에서 동영상 링크 복사 및 붙여넣기",
+        step2Title: "플랫폼 선택",
+        step2Desc: "동영상이 있는 올바른 플랫폼 선택",
+        step3Title: "형식 선택",
+        step3Desc: "동영상 품질 또는 오디오 형식(MP3) 선택",
+        step4Title: "다운로드",
+        step4Desc: "다운로드 클릭하고 몇 초 안에 파일 저장",
+        faqTitle: "자주 묻는 질문",
+        faq1Q: "이 서비스는 무료인가요?",
+        faq1A: "예, 저희 서비스는 숨겨진 비용 없이 완전히 무료입니다.",
+        faq2Q: "어떤 동영상 품질을 사용할 수 있나요?",
+        faq2A: "YouTube의 경우 4K 해상도까지, 다른 플랫폼의 경우 최고 품질을 지원합니다.",
+        faq3Q: "비공개 동영상을 다운로드할 수 있나요?",
+        faq3A: "아니요, 저희 서비스는 공개 동영상만 지원합니다.",
+        faq4Q: "다운로드 제한이 있나요?",
+        faq4A: "아니요, 제한 없이 원하는 만큼 동영상을 다운로드할 수 있습니다.",
+        statsTitle: "우리의 행복한 사용자들",
+        stat1: "다운로드",
+        stat2: "국가",
+        stat3: "가동 시간",
+        stat4: "언어",
+        footerPrivacy: "개인정보 보호정책",
+        footerTerms: "이용 약관",
+        footerContact: "문의하기",
+        footerAbout: "회사 소개",
+        footerDmca: "DMCA",
+        footerAffiliate: "저희는 YouTube, Instagram, TikTok 또는 그 모회사와 제휴 관계가 없습니다.",
+        footerNote: "개인적인 용도로만 사용하세요. 저작권이 있는 자료를 다운로드하는 것은 서비스 약관을 위반할 수 있습니다.",
+        footerRights: "모든 권리 보유"
+      },
+      fr: {
+        title: "Téléchargeur Rapide",
+        subtitle: "Téléchargez depuis",
+        downloadText: "des vidéos en un clic",
+        linkLabel: "Collez votre lien vidéo ci-dessous",
+        platformLabel: "Sélectionnez la plateforme",
+        downloadBtnText: "Télécharger Maintenant",
+        featuresTitle: "Fonctionnalités Clés",
+        feature1Title: "Rapidité Éclair",
+        feature1Desc: "Téléchargez des vidéos à vitesse maximale avec nos serveurs optimisés",
+        feature2Title: "Multiples Formats",
+        feature2Desc: "MP4, MP3, WEBM et autres formats supportés",
+        feature3Title: "Adapté Mobile",
+        feature3Desc: "Fonctionne parfaitement sur tous les appareils et tailles d'écran",
+        feature4Title: "Sécurisé et Sûr",
+        feature4Desc: "Pas de connexion requise, aucune collecte de données",
+        feature5Title: "Multilingue",
+        feature5Desc: "Prend en charge 12+ langues pour les utilisateurs mondiaux",
+        feature6Title: "Téléchargements Illimités",
+        feature6Desc: "Aucune restriction sur le nombre de téléchargements",
+        howToUseTitle: "Comment Utiliser",
+        step1Title: "Collez l'URL",
+        step1Desc: "Copiez et collez le lien vidéo depuis YouTube, Instagram ou TikTok",
+        step2Title: "Sélectionnez la Plateforme",
+        step2Desc: "Choisissez la bonne plateforme d'où provient la vidéo",
+        step3Title: "Choisissez le Format",
+        step3Desc: "Sélectionnez la qualité vidéo ou le format audio (MP3)",
+        step4Title: "Télécharger",
+        step4Desc: "Cliquez sur télécharger et enregistrez votre fichier en quelques secondes",
+        faqTitle: "FAQ",
+        faq1Q: "Ce service est-il gratuit?",
+        faq1A: "Oui, notre service est entièrement gratuit sans frais cachés.",
+        faq2Q: "Quelle qualité vidéo est disponible?",
+        faq2A: "Nous prenons en charge jusqu'à la résolution 4K pour YouTube et la meilleure qualité disponible pour d'autres plateformes.",
+        faq3Q: "Puis-je télécharger des vidéos privées?",
+        faq3A: "Non, notre service ne fonctionne qu'avec des vidéos publiquement disponibles.",
+        faq4Q: "Y a-t-il une limite de téléchargement?",
+        faq4A: "Non, vous pouvez télécharger autant de vidéos que vous le souhaitez sans restrictions.",
+        statsTitle: "Nos Utilisateurs Satisfaits",
+        stat1: "Téléchargements",
+        stat2: "Pays",
+        stat3: "Disponibilité",
+        stat4: "Langues",
+        footerPrivacy: "Politique de Confidentialité",
+        footerTerms: "Conditions d'Utilisation",
+        footerContact: "Nous Contacter",
+        footerAbout: "À Propos",
+        footerDmca: "DMCA",
+        footerAffiliate: "Nous ne sommes pas affiliés à YouTube, Instagram, TikTok ou leurs sociétés mères.",
+        footerNote: "Pour usage personnel uniquement. Le téléchargement de matériel protégé par des droits d'auteur peut enfreindre les conditions d'utilisation.",
+        footerRights: "Tous Droits Réservés"
+      },
+      de: {
+        title: "Schneller Downloader",
+        subtitle: "Laden Sie von",
+        downloadText: "Videos mit einem Klick herunter",
+        linkLabel: "Fügen Sie Ihren Video-Link unten ein",
+        platformLabel: "Plattform auswählen",
+        downloadBtnText: "Jetzt herunterladen",
+        featuresTitle: "Hauptmerkmale",
+        feature1Title: "Blitzschnell",
+        feature1Desc: "Laden Sie Videos mit unserer optimierten Server mit maximaler Geschwindigkeit herunter",
+        feature2Title: "Mehrere Formate",
+        feature2Desc: "MP4, MP3, WEBM und weitere unterstützte Formate",
+        feature3Title: "Mobilfreundlich",
+        feature3Desc: "Funktioniert perfekt auf allen Geräten und Bildschirmgrößen",
+        feature4Title: "Sicher und geschützt",
+        feature4Desc: "Kein Login erforderlich, keine Datensammlung",
+        feature5Title: "Mehrsprachig",
+        feature5Desc: "Unterstützt 12+ Sprachen für globale Nutzer",
+        feature6Title: "Unbegrenzte Downloads",
+        feature6Desc: "Keine Einschränkungen bei der Anzahl der Downloads",
+        howToUseTitle: "Anleitung",
+        step1Title: "URL einfügen",
+        step1Desc: "Kopieren und fügen Sie den Video-Link von YouTube, Instagram oder TikTok ein",
+        step2Title: "Plattform auswählen",
+        step2Desc: "Wählen Sie die richtige Plattform, von der das Video stammt",
+        step3Title: "Format wählen",
+        step3Desc: "Wählen Sie die Videoqualität oder das Audioformat (MP3)",
+        step4Title: "Herunterladen",
+        step4Desc: "Klicken Sie auf Herunterladen und speichern Sie Ihre Datei in Sekunden",
+        faqTitle: "Häufig gestellte Fragen",
+        faq1Q: "Ist dieser Service kostenlos?",
+        faq1A: "Ja, unser Service ist völlig kostenlos ohne versteckte Gebühren.",
+        faq2Q: "Welche Videoqualität ist verfügbar?",
+        faq2A: "Wir unterstützen bis zu 4K-Auflösung für YouTube und die höchste verfügbare Qualität für andere Plattformen.",
+        faq3Q: "Kann ich private Videos herunterladen?",
+        faq3A: "Nein, unser Service funktioniert nur mit öffentlich verfügbaren Videos.",
+        faq4Q: "Gibt es ein Download-Limit?",
+        faq4A: "Nein, Sie können so viele Videos herunterladen, wie Sie möchten, ohne Einschränkungen.",
+        statsTitle: "Unsere zufriedenen Nutzer",
+        stat1: "Downloads",
+        stat2: "Länder",
+        stat3: "Betriebszeit",
+        stat4: "Sprachen",
+        footerPrivacy: "Datenschutzrichtlinie",
+        footerTerms: "Nutzungsbedingungen",
+        footerContact: "Kontakt",
+        footerAbout: "Über uns",
+        footerDmca: "DMCA",
+        footerAffiliate: "Wir sind nicht mit YouTube, Instagram, TikTok oder ihren Muttergesellschaften verbunden.",
+        footerNote: "Nur für den persönlichen Gebrauch. Das Herunterladen urheberrechtlich geschützter Materialien kann gegen die Nutzungsbedingungen verstoßen.",
+        footerRights: "Alle Rechte vorbehalten"
+      },
+      ta: {
+        title: "வேகமான பதிவிறக்கி",
+        subtitle: "இதிலிருந்து பதிவிறக்கவும்",
+        downloadText: "ஒரே கிளிக்கில் வீடியோக்கள்",
+        linkLabel: "உங்கள் வீடியோ இணைப்பை கீழே ஒட்டவும்",
+        platformLabel: "தளத்தைத் தேர்ந்தெடுக்கவும்",
+        downloadBtnText: "இப்போது பதிவிறக்கவும்",
+        featuresTitle: "முக்கிய அம்சங்கள்",
+        feature1Title: "மின்னல் வேகம்",
+        feature1Desc: "எங்கள் மேம்படுத்தப்பட்ட சேவையகங்களுடன் அதிகபட்ச வேகத்தில் வீடியோக்களைப் பதிவிறக்கவும்",
+        feature2Title: "பல வடிவங்கள்",
+        feature2Desc: "MP4, MP3, WEBM மற்றும் பிற ஆதரவு வடிவங்கள்",
+        feature3Title: "மொபைல் ஃப்ரெண்ட்லி",
+        feature3Desc: "அனைத்து சாதனங்கள் மற்றும் திரை அளவுகளில் சரியாக வேலை செய்கிறது",
+        feature4Title: "பாதுகாப்பான மற்றும் பாதுகாப்பானது",
+        feature4Desc: "உள்நுழைவு தேவையில்லை, தரவு சேகரிப்பு இல்லை",
+        feature5Title: "பல மொழி",
+        feature5Desc: "உலகளாவிய பயனர்களுக்கு 12+ மொழிகளை ஆதரிக்கிறது",
+        feature6Title: "வரம்பற்ற பதிவிறக்கங்கள்",
+        feature6Desc: "பதிவிறக்கங்களின் எண்ணிக்கையில் எந்த வரம்புகளும் இல்லை",
+        howToUseTitle: "எப்படி பயன்படுத்துவது",
+        step1Title: "URL ஐ ஒட்டவும்",
+        step1Desc: "YouTube, Instagram அல்லது TikTok இலிருந்து வீடியோ இணைப்பை நகலெடுத்து ஒட்டவும்",
+        step2Title: "தளத்தைத் தேர்ந்தெடுக்கவும்",
+        step2Desc: "வீடியோ வந்த சரியான தளத்தைத் தேர்ந்தெடுக்கவும்",
+        step3Title: "வடிவத்தைத் தேர்ந்தெடுக்கவும்",
+        step3Desc: "வீடியோ தரம் அல்லது ஆடியோ வடிவத்தை (MP3) தேர்ந்தெடுக்கவும்",
+        step4Title: "பதிவிறக்கவும்",
+        step4Desc: "பதிவிறக்கம் என்பதைக் கிளிக் செய்து, உங்கள் கோப்பை வினாடிகளில் சேமிக்கவும்",
+        faqTitle: "அடிக்கடி கேட்கப்படும் கேள்விகள்",
+        faq1Q: "இந்த சேவை இலவசமா?",
+        faq1A: "ஆம், எங்கள் சேவை முற்றிலும் இலவசம், மறைமுக கட்டணம் இல்லை.",
+        faq2Q: "என்ன வீடியோ தரம் கிடைக்கிறது?",
+        faq2A: "YouTube க்கு 4K தெளிவுத்திறன் வரை மற்றும் பிற தளங்களுக்கு அதிகபட்ச கிடைக்கும் தரத்தை நாங்கள் ஆதரிக்கிறோம்.",
+        faq3Q: "தனிப்பட்ட வீடியோக்களைப் பதிவிறக்க முடியுமா?",
+        faq3A: "இல்லை, எங்கள் சேவை பொது வீடியோக்களுடன் மட்டுமே வேலை செய்கிறது.",
+        faq4Q: "பதிவிறக்க வரம்பு உள்ளதா?",
+        faq4A: "இல்லை, நீங்கள் எத்தனை வீடியோக்களை வேண்டுமானாலும் பதிவிறக்கலாம்.",
+        statsTitle: "எங்கள் மகிழ்ச்சியான பயனர்கள்",
+        stat1: "பதிவிறக்கங்கள்",
+        stat2: "நாடுகள்",
+        stat3: "இயங்கும் நேரம்",
+        stat4: "மொழிகள்",
+        footerPrivacy: "தனியுரிமைக் கொள்கை",
+        footerTerms: "சேவை விதிமுறைகள்",
+        footerContact: "எங்களைத் தொடர்பு கொள்ளவும்",
+        footerAbout: "எங்களைப் பற்றி",
+        footerDmca: "DMCA",
+        footerAffiliate: "நாங்கள் YouTube, Instagram, TikTok அல்லது அவற்றின் தாய் நிறுவனங்களுடன் இணைக்கப்படவில்லை.",
+        footerNote: "தனிப்பட்ட பயன்பாட்டிற்கு மட்டுமே. பதிப்புரிமை கொண்ட பொருட்களைப் பதிவிறக்குவது சேவை விதிமுறைகளை மீறலாம்.",
+        footerRights: "அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை"
+      },
+      te: {
+        title: "ఫాస్ట్ డౌన్లోడర్",
+        subtitle: "నుండి డౌన్లోడ్ చేయండి",
+        downloadText: "ఒకే క్లిక్‌లో వీడియోలు",
+        linkLabel: "మీ వీడియో లింక్‌ను క్రింద పేస్ట్ చేయండి",
+        platformLabel: "ప్లాట్‌ఫారమ్‌ను ఎంచుకోండి",
+        downloadBtnText: "ఇప్పుడే డౌన్లోడ్ చేయండి",
+        featuresTitle: "ప్రధాన లక్షణాలు",
+        feature1Title: "మెరుపు వేగం",
+        feature1Desc: "మా ఆప్టిమైజ్ చేసిన సర్వర్‌లతో గరిష్ట వేగంతో వీడియోలను డౌన్లోడ్ చేయండి",
+        feature2Title: "బహుళ ఫార్మాట్‌లు",
+        feature2Desc: "MP4, MP3, WEBM మరియు ఇతర మద్దతు ఫార్మాట్‌లు",
+        feature3Title: "మొబైల్ ఫ్రెండ్లీ",
+        feature3Desc: "అన్ని పరికరాలు మరియు స్క్రీన్ పరిమాణాలలో సరిగ్గా పనిచేస్తుంది",
+        feature4Title: "సురక్షితమైన మరియు సురక్షితమైనది",
+        feature4Desc: "లాగిన్ అవసరం లేదు, డేటా సేకరణ లేదు",
+        feature5Title: "బహుభాషా",
+        feature5Desc: "గ్లోబల్ వినియోగదారుల కోసం 12+ భాషలకు మద్దతు",
+        feature6Title: "అపరిమిత డౌన్లోడ్‌లు",
+        feature6Desc: "డౌన్లోడ్‌ల సంఖ్యపై పరిమితులు లేవు",
+        howToUseTitle: "ఎలా ఉపయోగించాలి",
+        step1Title: "URL ను పేస్ట్ చేయండి",
+        step1Desc: "YouTube, Instagram లేదా TikTok నుండి వీడియో లింక్‌ను కాపీ చేసి పేస్ట్ చేయండి",
+        step2Title: "ప్లాట్‌ఫారమ్‌ను ఎంచుకోండి",
+        step2Desc: "వీడియో వచ్చిన సరైన ప్లాట్‌ఫారమ్‌ను ఎంచుకోండి",
+        step3Title: "ఫార్మాట్‌ను ఎంచుకోండి",
+        step3Desc: "వీడియో నాణ్యత లేదా ఆడియో ఫార్మాట్ (MP3) ఎంచుకోండి",
+        step4Title: "డౌన్లోడ్",
+        step4Desc: "డౌన్లోడ్‌పై క్లిక్ చేసి, మీ ఫైల్‌ను సెకన్లలో సేవ్ చేయండి",
+        faqTitle: "తరచుగా అడిగే ప్రశ్నలు",
+        faq1Q: "ఈ సేవ ఉచితమా?",
+        faq1A: "అవును, మా సేవ పూర్తిగా ఉచితం, దాచిన ఛార్జీలు లేవు.",
+        faq2Q: "ఏ వీడియో నాణ్యత అందుబాటులో ఉంది?",
+        faq2A: "మేము YouTube కోసం 4K రిజల్యూషన్ వరకు మరియు ఇతర ప్లాట్‌ఫారమ్‌లకు గరిష్ట నాణ్యతను మద్దతు ఇస్తాము.",
+        faq3Q: "ప్రైవేట్ వీడియోలను డౌన్లోడ్ చేయగలనా?",
+        faq3A: "లేదు, మా సేవ పబ్లిక్‌గా అందుబాటులో ఉన్న వీడియోలతో మాత్రమే పనిచేస్తుంది.",
+        faq4Q: "డౌన్లోడ్ పరిమితి ఉందా?",
+        faq4A: "లేదు, మీరు ఎన్ని వీడియోలను కావాలంటే డౌన్లోడ్ చేయవచ్చు.",
+        statsTitle: "మా సంతోషకరమైన వినియోగదారులు",
+        stat1: "డౌన్లోడ్‌లు",
+        stat2: "దేశాలు",
+        stat3: "అప్‌టైమ్",
+        stat4: "భాషలు",
+        footerPrivacy: "గోప్యతా విధానం",
+        footerTerms: "సేవా నిబంధనలు",
+        footerContact: "మమ్మల్ని సంప్రదించండి",
+        footerAbout: "మా గురించి",
+        footerDmca: "DMCA",
+        footerAffiliate: "మేము YouTube, Instagram, TikTok లేదా వాటి మాతృ సంస్థలతో అనుబంధం కలిగి లేము.",
+        footerNote: "వ్యక్తిగత ఉపయోగం కోసం మాత్రమే. కాపీరైట్ మెటీరియల్‌ను డౌన్లోడ్ చేయడం సేవా నిబంధనలను ఉల్లంఘించవచ్చు.",
+        footerRights: "అన్ని హక్కులు ప్రత్యేకించబడినవి"
+      }
+    };
+
+    // Apply language translations
+    const applyLanguage = lang => {
+      const t = translations[lang] || translations.en;
+      
+      // Update all elements with translations
+      document.getElementById("title").innerText = t.title;
+      document.getElementById("subtitle").innerHTML = `${t.subtitle} <span class="text-red-500 font-bold"><i class="fab fa-youtube mr-2"></i>YouTube</span>, <span class="text-pink-400 font-bold"><i class="fab fa-instagram mr-2"></i>Instagram</span>, <span class="text-green-400 font-bold"><i class="fab fa-tiktok mr-2"></i>TikTok</span> <span id="download-text">${t.downloadText}</span>`;
+      document.getElementById("link-label").innerText = t.linkLabel;
+      document.getElementById("platform-label").innerText = t.platformLabel;
+      document.getElementById("download-btn-text").innerText = t.downloadBtnText;
+      document.getElementById("features-title").innerText = t.featuresTitle;
+      document.getElementById("feature-1-title").innerText = t.feature1Title;
+      document.getElementById("feature-1-desc").innerText = t.feature1Desc;
+      document.getElementById("feature-2-title").innerText = t.feature2Title;
+      document.getElementById("feature-2-desc").innerText = t.feature2Desc;
+      document.getElementById("feature-3-title").innerText = t.feature3Title;
+      document.getElementById("feature-3-desc").innerText = t.feature3Desc;
+      document.getElementById("feature-4-title").innerText = t.feature4Title;
+      document.getElementById("feature-4-desc").innerText = t.feature4Desc;
+      document.getElementById("feature-5-title").innerText = t.feature5Title;
+      document.getElementById("feature-5-desc").innerText = t.feature5Desc;
+      document.getElementById("feature-6-title").innerText = t.feature6Title;
+      document.getElementById("feature-6-desc").innerText = t.feature6Desc;
+      document.getElementById("how-to-use-title").innerText = t.howToUseTitle;
+      document.getElementById("step-1-title").innerText = t.step1Title;
+      document.getElementById("step-1-desc").innerText = t.step1Desc;
+      document.getElementById("step-2-title").innerText = t.step2Title;
+      document.getElementById("step-2-desc").innerText = t.step2Desc;
+      document.getElementById("step-3-title").innerText = t.step3Title;
+      document.getElementById("step-3-desc").innerText = t.step3Desc;
+      document.getElementById("step-4-title").innerText = t.step4Title;
+      document.getElementById("step-4-desc").innerText = t.step4Desc;
+      document.getElementById("faq-title").innerText = t.faqTitle;
+      document.getElementById("faq-1-q").innerText = t.faq1Q;
+      document.getElementById("faq-1-a").innerHTML = `<i class="fas fa-check-circle text-green-400 mr-2"></i> ${t.faq1A}`;
+      document.getElementById("faq-2-q").innerText = t.faq2Q;
+      document.getElementById("faq-2-a").innerHTML = `<i class="fas fa-check-circle text-green-400 mr-2"></i> ${t.faq2A}`;
+      document.getElementById("faq-3-q").innerText = t.faq3Q;
+      document.getElementById("faq-3-a").innerHTML = `<i class="fas fa-times-circle text-red-400 mr-2"></i> ${t.faq3A}`;
+      document.getElementById("faq-4-q").innerText = t.faq4Q;
+      document.getElementById("faq-4-a").innerHTML = `<i class="fas fa-infinity text-blue-400 mr-2"></i> ${t.faq4A}`;
+      document.getElementById("stats-title").innerText = t.statsTitle;
+      document.getElementById("stat-1").innerText = t.stat1;
+      document.getElementById("stat-2").innerText = t.stat2;
+      document.getElementById("stat-3").innerText = t.stat3;
+      document.getElementById("stat-4").innerText = t.stat4;
+      document.getElementById("footer-privacy").innerText = t.footerPrivacy;
+      document.getElementById("footer-terms").innerText = t.footerTerms;
+      document.getElementById("footer-contact").innerText = t.footerContact;
+      document.getElementById("footer-about").innerText = t.footerAbout;
+      document.getElementById("footer-dmca").innerText = t.footerDmca;
+      document.getElementById("footer-affiliate").innerHTML = `<i class="fas fa-info-circle mr-2"></i> ${t.footerAffiliate}`;
+      document.getElementById("footer-note").innerHTML = `<i class="fas fa-exclamation-triangle mr-2"></i> ${t.footerNote}`;
+      document.getElementById("footer-rights").innerText = t.footerRights;
+    };
+
+    // Platform selection
+    document.querySelectorAll('.platform-option').forEach(option => {
+      option.addEventListener('click', function() {
+        document.querySelectorAll('.platform-option').forEach(opt => {
+          opt.classList.remove('border-blue-500', 'border-pink-500', 'border-green-500');
+        });
+        const value = this.getAttribute('data-value');
+        document.getElementById('platform-select').value = value;
+        
+        if(value === 'youtube') this.classList.add('border-blue-500');
+        if(value === 'instagram') this.classList.add('border-pink-500');
+        if(value === 'tiktok') this.classList.add('border-green-500');
+      });
+    });
+
+    // Language selector
+    document.getElementById("lang-select").addEventListener("change", e => {
+      applyLanguage(e.target.value);
+    });
+
+    // Initialize with English
+    applyLanguage("en");
+
+    // Download button functionality (placeholder)
+    document.getElementById("download-btn").addEventListener("click", function() {
+      const link = document.getElementById("link-input").value;
+      const platform = document.getElementById("platform-select").value;
+      
+      if(!link) {
+        document.getElementById("download-status").textContent = "Please enter a valid video URL";
+        return;
+      }
+      
+      document.getElementById("download-status").textContent = "Processing your download...";
+      
+      // Simulate download processing
+      setTimeout(() => {
+        document.getElementById("download-status").innerHTML = `
+          <i class="fas fa-check-circle mr-2"></i> Download ready! 
+          <a href="#" class="text-blue-300 underline">Click here</a> if download doesn't start automatically.
+        `;
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
