@@ -1045,48 +1045,67 @@
     };
 
     // Platform selection
-    document.querySelectorAll('.platform-option').forEach(option => {
-      option.addEventListener('click', function() {
-        document.querySelectorAll('.platform-option').forEach(opt => {
-          opt.classList.remove('border-blue-500', 'border-pink-500', 'border-green-500');
-        });
-        const value = this.getAttribute('data-value');
-        document.getElementById('platform-select').value = value;
-        
-        if(value === 'youtube') this.classList.add('border-blue-500');
-        if(value === 'instagram') this.classList.add('border-pink-500');
-        if(value === 'tiktok') this.classList.add('border-green-500');
-      });
+document.querySelectorAll('.platform-option').forEach(option => {
+  option.addEventListener('click', function() {
+    document.querySelectorAll('.platform-option').forEach(opt => {
+      opt.classList.remove('border-blue-500', 'border-pink-500', 'border-green-500');
     });
+    const value = this.getAttribute('data-value');
+    document.getElementById('platform-select').value = value;
+    
+    if(value === 'youtube') this.classList.add('border-blue-500');
+    if(value === 'instagram') this.classList.add('border-pink-500');
+    if(value === 'tiktok') this.classList.add('border-green-500');
+  });
+});
 
-    // Language selector
-    document.getElementById("lang-select").addEventListener("change", e => {
-      applyLanguage(e.target.value);
-    });
+// Language selector
+document.getElementById("lang-select").addEventListener("change", e => {
+  applyLanguage(e.target.value);
+});
 
-    // Initialize with English
-    applyLanguage("en");
+// Initialize with English
+applyLanguage("en");
 
-    // Download button functionality (placeholder)
-    document.getElementById("download-btn").addEventListener("click", function() {
-      const link = document.getElementById("link-input").value;
-      const platform = document.getElementById("platform-select").value;
-      
-      if(!link) {
-        document.getElementById("download-status").textContent = "Please enter a valid video URL";
-        return;
-      }
-      
-      document.getElementById("download-status").textContent = "Processing your download...";
-      
-      // Simulate download processing
-      setTimeout(() => {
-        document.getElementById("download-status").innerHTML = `
-          <i class="fas fa-check-circle mr-2"></i> Download ready! 
-          <a href="#" class="text-blue-300 underline">Click here</a> if download doesn't start automatically.
-        `;
-      }, 2000);
-    });
+// Download button functionality (connected to backend)
+document.getElementById("download-btn").addEventListener("click", function() {
+  const link = document.getElementById("link-input").value;
+  const platform = document.getElementById("platform-select").value;
+  
+  if(!link) {
+    document.getElementById("download-status").textContent = "Please enter a valid video URL";
+    return;
+  }
+
+  // Show "Processing" message while calling the backend
+  document.getElementById("download-status").textContent = "Processing your download...";
+
+  // Backend request to process the download
+  fetch("https://fast-downloader.onrender.com/download", {  // <-- Use your Render backend URL here
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ link: link, platform: platform }),
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Handle the successful response
+    if (data.success) {
+      document.getElementById("download-status").innerHTML = `
+        <i class="fas fa-check-circle mr-2"></i> Download ready! 
+        <a href="${data.download_url}" class="text-blue-300 underline" download>Click here</a> if download doesn't start automatically.
+      `;
+    } else {
+      document.getElementById("download-status").textContent = "Something went wrong. Please try again.";
+    }
+  })
+  .catch(error => {
+    document.getElementById("download-status").textContent = "Error processing the download. Please try again.";
+    console.error("Error:", error);
+  });
+});
+
   </script>
 </body>
 </html>
